@@ -30,7 +30,23 @@ func (renderer *PxCanvasRenderer) Objects() []fyne.CanvasObject {
 func (renderer *PxCanvasRenderer) Destroy() {}
 
 // WidgetRenderer interface implementation.
-func (renderer *PxCanvasRenderer) Layout(size fyne.Size) {}
+func (renderer *PxCanvasRenderer) Refresh() {
+	if renderer.pxCanvas.reloadImage {
+		renderer.canvasImage = canvas.NewImageFromImage(renderer.pxCanvas.PixelData)
+		renderer.canvasImage.ScaleMode = canvas.ImageScalePixels
+		renderer.canvasImage.FillMode = canvas.ImageFillContain
+		renderer.pxCanvas.reloadImage = false
+	}
+	renderer.Layout(renderer.pxCanvas.Size())
+	canvas.Refresh(renderer.canvasImage)
+}
+
+// WidgetRenderer interface implementation.
+func (renderer *PxCanvasRenderer) Layout(size fyne.Size) {
+	renderer.LayoutCanvas(size)
+	renderer.LayoutBorder(size)
+
+}
 
 func (renderer *PxCanvasRenderer) LayoutCanvas(size fyne.Size) {
 	imgPxWidth := renderer.pxCanvas.PxCols
